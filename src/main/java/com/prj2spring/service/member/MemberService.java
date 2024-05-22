@@ -7,6 +7,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional(rollbackFor = Exception.class)
 @RequiredArgsConstructor
@@ -19,7 +21,7 @@ public class MemberService {
         member.setPassword(bCryptPasswordEncoder.encode(member.getPassword()));
         member.setEmail(member.getEmail().trim());
         member.setNickName(member.getNickName().trim());
-        
+
         mapper.insert(member);
     }
 
@@ -45,5 +47,9 @@ public class MemberService {
         }
 
         return true;
+    }
+
+    public List<Member> selectAll() {
+        return mapper.selectAll();
     }
 }
