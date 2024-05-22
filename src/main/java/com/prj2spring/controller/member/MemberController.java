@@ -14,8 +14,13 @@ public class MemberController {
     final MemberService service;
 
     @PostMapping("signup")
-    public void signup(@RequestBody Member member) {
-        service.add(member);
+    public ResponseEntity signup(@RequestBody Member member) {
+        if (service.validate(member)) {
+            service.add(member);
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping(value = "check", params = "email")
@@ -23,9 +28,9 @@ public class MemberController {
         System.out.println("email = " + email);
         Member member = service.getByEmail(email);
         if (member == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.notFound().build();   // 404
         }
-        return ResponseEntity.ok(email);
+        return ResponseEntity.ok(email);    // 200
     }
 
     @GetMapping(value = "check", params = "nickName")
