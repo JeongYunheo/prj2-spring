@@ -16,6 +16,7 @@ public class MemberService {
 
     final MemberMapper mapper;
     final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     public void add(Member member) {
         member.setPassword(bCryptPasswordEncoder.encode(member.getPassword()));
@@ -59,5 +60,15 @@ public class MemberService {
 
     public void remove(Integer id) {
         mapper.deleteById(id);
+    }
+
+    public boolean hasAccess(Member member) {
+        Member dbMember = mapper.selectById(member.getId());
+        System.out.println("dbMember = " + dbMember);
+        if (dbMember == null) {
+            return false;
+        }
+
+        return passwordEncoder.matches(member.getPassword(), dbMember.getPassword());
     }
 }
