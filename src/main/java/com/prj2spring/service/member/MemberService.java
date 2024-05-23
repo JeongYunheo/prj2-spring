@@ -121,7 +121,7 @@ public class MemberService {
                         .expiresAt(now.plusSeconds(60 * 60 * 24 * 7))
                         .subject(member.getEmail())
                         .claim("scope", "")  //권한
-                        .claim("nickname", db.getNickName())
+                        .claim("nickName", db.getNickName())
                         .build();
                 token = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
 
