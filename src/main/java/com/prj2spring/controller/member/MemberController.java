@@ -5,6 +5,8 @@ import com.prj2spring.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -63,13 +65,15 @@ public class MemberController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Object> delete(@RequestBody Member member) {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Object> delete(@RequestBody Member member,
+                                         Authentication authentication) {
         System.out.println("member = " + member);
-        if (service.hasAccess(member)) {
+        if (service.hasAccess(member, authentication)) {
             service.remove(member.getId());
             return ResponseEntity.ok().build();
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     @PutMapping("modify")
@@ -85,6 +89,7 @@ public class MemberController {
     @PostMapping("token")
     public ResponseEntity token(@RequestBody Member member) {
         Map<String, Object> map = service.getToken(member);
+
         if (map == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

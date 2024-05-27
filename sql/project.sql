@@ -43,6 +43,17 @@ WHERE id > 0;
 ALTER TABLE board
     MODIFY COLUMN member_id INT NOT NULL;
 
+SELECT *
+FROM member
+WHERE email = 'qq@qq';
+
+DELETE
+FROM board
+WHERE member_id = 9;
+DELETE
+FROM member
+WHERE email = 'qq@qq';
+
 DESC board;
 
 SELECT *

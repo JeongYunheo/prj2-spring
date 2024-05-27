@@ -3,6 +3,7 @@ package com.prj2spring.controller.board;
 import com.prj2spring.domain.board.Board;
 import com.prj2spring.service.board.BoardService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -50,12 +51,23 @@ public class BoardController {
     }
 
     @DeleteMapping("{id}")
-    public void delete(@PathVariable Integer id) {
-        service.remove(id);
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity delete(@PathVariable Integer id
+            , Authentication authentication) {
+        if (service.hasAccess(id, authentication)) {
+            service.remove(id);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     @PutMapping("edit")
-    public ResponseEntity edit(@RequestBody Board board) {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity edit(@RequestBody Board board,
+                               Authentication authentication) {
+        if (!service.hasAccess(board.getId(), authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         if (service.validate(board)) {
             service.edit(board);
             return ResponseEntity.ok().build();

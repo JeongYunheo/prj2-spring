@@ -1,7 +1,6 @@
 package com.prj2spring.service.board;
 
 import com.prj2spring.domain.board.Board;
-import com.prj2spring.domain.member.Member;
 import com.prj2spring.mapper.board.BoardMapper;
 import com.prj2spring.mapper.member.MemberMapper;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,6 @@ public class BoardService {
     private final MemberMapper memberMapper;
 
     public void add(Board board, Authentication authentication) {
-        Member member = memberMapper.selectByEmail(authentication.getName());
         board.setMemberId(Integer.valueOf(authentication.getName()));
         mapper.insert(board);
     }
@@ -75,5 +73,11 @@ public class BoardService {
 
     public void edit(Board board) {
         mapper.update(board);
+    }
+
+    public boolean hasAccess(Integer id, Authentication authentication) {
+        Board board = mapper.selectById(id);
+        return board.getMemberId()
+                .equals(Integer.valueOf(authentication.getName()));
     }
 }
