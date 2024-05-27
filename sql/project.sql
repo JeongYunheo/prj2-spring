@@ -47,3 +47,13 @@ DESC board;
 
 SELECT *
 FROM board;
+
+USE prj2;
+
+# 게시물 여러개 입력
+INSERT INTO board(title, content, member_id)
+SELECT title, content, member_id
+FROM board;
+
+SELECT COUNT(*)
+FROM board;
