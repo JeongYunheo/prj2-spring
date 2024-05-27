@@ -42,8 +42,18 @@ public class BoardService {
 
         Integer offset = (page - 1) * 10;
         Integer lastPageNumber = (countAll - 1) / 10 + 1;
-        Integer leftPageNumber = (page - -1) / 10 * 10 + 1;
+        Integer leftPageNumber = (page - 1) / 10 * 10 + 1;
         Integer rightPageNumber = leftPageNumber + 9;
+        rightPageNumber = Math.min(rightPageNumber, lastPageNumber);
+        Integer prevPageNumber = leftPageNumber - 1;
+        Integer nextPageNumber = rightPageNumber + 1;
+
+        if (prevPageNumber > 0) {
+            pageInfo.put("prevPageNumber", prevPageNumber);
+        }
+        if (nextPageNumber <= lastPageNumber) {
+            pageInfo.put("nextPageNumber", nextPageNumber);
+        }
 
         pageInfo.put("currentPageNumber", page);
         pageInfo.put("lastPageNumber", lastPageNumber);
