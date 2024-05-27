@@ -22,7 +22,7 @@ public class BoardService {
 
     public void add(Board board, Authentication authentication) {
         Member member = memberMapper.selectByEmail(authentication.getName());
-        board.setMemberId(member.getId());
+        board.setMemberId(Integer.valueOf(authentication.getName()));
         mapper.insert(board);
     }
 
