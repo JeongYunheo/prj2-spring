@@ -33,13 +33,12 @@ public interface BoardMapper {
             DELETE FROM board
             WHERE member_id = #{memberId}
             """)
-    int deleteById(Integer id);
+    int deleteById(Integer memberId);
 
     @Update("""
             UPDATE board
             SET title=#{title},
-                content=#{content},
-                writer=#{writer}
+                content=#{content}
             WHERE id= #{id}
             """)
     void update(Board board);
@@ -117,4 +116,11 @@ public interface BoardMapper {
             WHERE member_id = #{memberId}
             """)
     List<Board> selectByMemberId(Integer memberId);
+
+    @Delete("""
+            DELETE FROM board_file
+            WHERE board_id = #{boardId}
+            AND name = #{fileName}
+            """)
+    void deleteFileByBoardIdAndName(Integer boardId, String fileName);
 }

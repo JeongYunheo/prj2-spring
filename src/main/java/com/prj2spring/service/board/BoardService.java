@@ -125,7 +125,19 @@ public class BoardService {
         mapper.deleteById(id);
     }
 
-    public void edit(Board board) {
+    public void edit(Board board, List<String> removeFileList) {
+
+        if (removeFileList != null && removeFileList.size() > 0) {
+            for (String fileName : removeFileList) {
+                //disk delete
+                String path = STR."C:/Windows/Temp/prj2/\{board.getId()}/\{fileName}";
+                File file = new File(path);
+                file.delete();
+                //db recode delete
+                mapper.deleteFileByBoardIdAndName(board.getId(), fileName);
+            }
+        }
+
         mapper.update(board);
     }
 
