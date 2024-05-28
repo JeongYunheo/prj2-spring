@@ -124,3 +124,6 @@ VALUES (25, 'admin');
 
 SELECT *
 FROM authority;
+
+SELECT *
+FROM member;
