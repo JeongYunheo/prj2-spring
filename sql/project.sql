@@ -109,5 +109,18 @@ CREATE TABLE board_file
 );
 
 SELECT *
-FROM board_file;
+FROM board_file
+WHERE board_id = 554;
 
+CREATE TABLE authority
+(
+    member_id INT         NOT NULL REFERENCES member (id),
+    name      VARCHAR(20) NOT NULL,
+    PRIMARY KEY (member_id, name)
+);
+
+INSERT INTO authority (member_id, name)
+VALUES (25, 'admin');
+
+SELECT *
+FROM authority;
