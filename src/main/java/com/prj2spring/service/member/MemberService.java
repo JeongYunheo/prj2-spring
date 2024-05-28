@@ -26,14 +26,13 @@ import java.util.Map;
 public class MemberService {
 
     final MemberMapper mapper;
-    final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtEncoder jwtEncoder;
     private final BoardMapper boardMapper;
     private final BoardService boardService;
 
     public void add(Member member) {
-        member.setPassword(bCryptPasswordEncoder.encode(member.getPassword()));
+        member.setPassword(passwordEncoder.encode(member.getPassword()));
         member.setEmail(member.getEmail().trim());
         member.setNickName(member.getNickName().trim());
 
