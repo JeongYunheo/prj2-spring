@@ -46,14 +46,14 @@ public interface MemberMapper {
             DELETE FROM member
             WHERE id = #{id}
             """)
-    void deleteById(Integer id);
+    int deleteById(Integer id);
 
     @Update("""
             UPDATE member
             SET password = #{password}, nick_name = #{nickName}
             WHERE id = #{id}
             """)
-    void update(Member member);
-    
+    int update(Member member);
+
 
 }

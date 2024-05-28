@@ -31,7 +31,6 @@ public class MemberController {
 
     @GetMapping(value = "check", params = "email")
     public ResponseEntity check(@RequestParam("email") String email) {
-        System.out.println("email = " + email);
         Member member = service.getByEmail(email);
         if (member == null) {
             return ResponseEntity.notFound().build();   // 404
@@ -42,7 +41,6 @@ public class MemberController {
     @GetMapping(value = "check", params = "nickName")
     public ResponseEntity checkNickName(@RequestParam("nickName") String nickName) {
         Member member = service.getByNickName(nickName);
-        System.out.println("nickName = " + nickName);
         if (member == null) {
             return ResponseEntity.notFound().build();
         }
@@ -50,12 +48,19 @@ public class MemberController {
     }
 
     @GetMapping("list")
+    @PreAuthorize("hasAuthority('SCOPE_admin')")
     public List<Member> list() {
-        return service.selectAll();
+        return service.list();
     }
 
     @GetMapping("{id}")
-    public ResponseEntity get(@PathVariable Integer id) {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity get(@PathVariable Integer id,
+                              Authentication authentication) {
+        if (!service.hasAccess(id, authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         Member member = service.getById(id);
         if (member == null) {
             return ResponseEntity.notFound().build();
@@ -66,9 +71,9 @@ public class MemberController {
 
     @DeleteMapping("{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Object> delete(@RequestBody Member member,
-                                         Authentication authentication) {
-        System.out.println("member = " + member);
+    public ResponseEntity<Object> delete(
+            @RequestBody Member member,
+            Authentication authentication) {
         if (service.hasAccess(member, authentication)) {
             service.remove(member.getId());
             return ResponseEntity.ok().build();
@@ -77,10 +82,12 @@ public class MemberController {
     }
 
     @PutMapping("modify")
-    public ResponseEntity modify(@RequestBody Member member) {
-        if (service.hasAccessModify(member)) {
-            service.modify(member);
-            return ResponseEntity.ok().build();
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity modify(@RequestBody Member member,
+                                 Authentication authentication) {
+        if (service.hasAccessModify(member, authentication)) {
+            Map<String, Object> result = service.modify(member, authentication);
+            return ResponseEntity.ok(result);
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }

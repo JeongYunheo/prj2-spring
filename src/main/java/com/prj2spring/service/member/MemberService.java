@@ -1,10 +1,14 @@
 package com.prj2spring.service.member;
 
+import com.prj2spring.domain.board.Board;
 import com.prj2spring.domain.member.Member;
+import com.prj2spring.mapper.board.BoardMapper;
 import com.prj2spring.mapper.member.MemberMapper;
+import com.prj2spring.service.board.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
@@ -25,6 +29,8 @@ public class MemberService {
     final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtEncoder jwtEncoder;
+    private final BoardMapper boardMapper;
+    private final BoardService boardService;
 
     public void add(Member member) {
         member.setPassword(bCryptPasswordEncoder.encode(member.getPassword()));
@@ -35,15 +41,18 @@ public class MemberService {
     }
 
     public Member getByEmail(String email) {
-        return mapper.selectByEmail(email);
+        return mapper.selectByEmail(email.trim());
     }
 
     public Member getByNickName(String nickName) {
-        return mapper.selectByNickName(nickName);
+        return mapper.selectByNickName(nickName.trim());
     }
 
     public boolean validate(Member member) {
         if (member.getEmail() == null || member.getEmail().isBlank()) {
+            return false;
+        }
+        if (member.getNickName() == null || member.getNickName().isBlank()) {
             return false;
         }
         if (member.getPassword() == null || member.getPassword().isBlank()) {
@@ -58,7 +67,7 @@ public class MemberService {
         return true;
     }
 
-    public List<Member> selectAll() {
+    public List<Member> list() {
         return mapper.selectAll();
     }
 
@@ -67,12 +76,23 @@ public class MemberService {
     }
 
     public void remove(Integer id) {
+        // 회원이 쓴 게시물 조회
+        List<Board> boardList = boardMapper.selectByMemberId(id);
+
+        // 각 게시물 지우기
+        boardList.forEach(board -> boardService.remove(board.getId()));
+
+        // member table에서 지우기
         mapper.deleteById(id);
     }
 
     public boolean hasAccess(Member member, Authentication authentication) {
+        if (!member.getId().toString().equals(authentication.getName())) {
+            return false;
+        }
+
         Member dbMember = mapper.selectById(member.getId());
-        System.out.println("dbMember = " + dbMember);
+
         if (dbMember == null) {
             return false;
         }
@@ -80,19 +100,31 @@ public class MemberService {
         return passwordEncoder.matches(member.getPassword(), dbMember.getPassword());
     }
 
-    public void modify(Member member) {
+    public Map<String, Object> modify(Member member, Authentication authentication) {
         if (member.getPassword() != null && member.getPassword().length() > 0) {
             // 패스워드가 입력되면 바꾸기
-            member.setPassword(bCryptPasswordEncoder.encode(member.getPassword()));
+            member.setPassword(passwordEncoder.encode(member.getPassword()));
         } else {
             // 입력이 안됐으니 기존 값으로 유지
             Member dbMember = mapper.selectById(member.getId());
             member.setPassword(dbMember.getPassword());
         }
         mapper.update(member);
+        String token = "";
+
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        Map<String, Object> claims = jwt.getClaims();
+        JwtClaimsSet.Builder jwtClaimsSetBuilder = JwtClaimsSet.builder();
+        claims.forEach(jwtClaimsSetBuilder::claim);
+        jwtClaimsSetBuilder.claim("nickName", member.getNickName());
+
+        JwtClaimsSet jwtClaimsSet = jwtClaimsSetBuilder.build();
+        token = jwtEncoder.encode(JwtEncoderParameters.from(jwtClaimsSet)).getTokenValue();
+        return Map.of("token", token);
     }
 
-    public boolean hasAccessModify(Member member) {
+
+    public boolean hasAccessModify(Member member, Authentication authentication) {
         Member dbMember = mapper.selectById(member.getId());
         if (dbMember == null) {
             return false;
@@ -133,5 +165,15 @@ public class MemberService {
         }
 
         return result;
+    }
+
+    public boolean hasAccess(Integer id, Authentication authentication) {
+        boolean self = authentication.getName().equals(id.toString());
+
+        boolean isAdmin = authentication.getAuthorities()
+                .stream()
+                .anyMatch(a -> a.getAuthority().equals("SCOPE_admin"));
+
+        return self || isAdmin;
     }
 }
