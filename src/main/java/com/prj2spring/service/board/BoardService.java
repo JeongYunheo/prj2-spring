@@ -1,6 +1,7 @@
 package com.prj2spring.service.board;
 
 import com.prj2spring.domain.board.Board;
+import com.prj2spring.domain.board.BoardFile;
 import com.prj2spring.mapper.board.BoardMapper;
 import com.prj2spring.mapper.member.MemberMapper;
 import lombok.RequiredArgsConstructor;
@@ -93,11 +94,11 @@ public class BoardService {
     public Board get(Integer id) {
         Board board = mapper.selectById(id);
         List<String> fileNames = mapper.selectFileNameByBoardId(id);
-        List<String> imageSrcList = fileNames.stream()
-                .map(name -> STR."http://172.30.1.51:8888/\{id}/\{name}")
+        List<BoardFile> files = fileNames.stream()
+                .map(name -> new BoardFile(name, STR."http://172.30.1.51:8888/\{id}/\{name}"))
                 .toList();
 
-        board.setImageSrcList(imageSrcList);
+        board.setFiles(files);
 
         // http://172.30.1.51:8888/{id}/{name}
         return board;
