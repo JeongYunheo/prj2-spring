@@ -98,7 +98,7 @@ public class BoardService {
                 .map(name -> new BoardFile(name, STR."http://172.30.1.51:8888/\{id}/\{name}"))
                 .toList();
 
-        board.setFiles(files);
+        board.setFileList(files);
 
         // http://172.30.1.51:8888/{id}/{name}
         return board;
