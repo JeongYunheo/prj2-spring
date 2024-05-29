@@ -21,9 +21,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
-import javax.swing.plaf.synth.Region;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
@@ -49,7 +49,7 @@ public class AppConfiguration {
         AwsCredentialsProvider provider = StaticCredentialsProvider.create(credentials);
         S3Client s3Client = S3Client.builder()
                 .region(Region.AP_NORTHEAST_2)
-                .credentialProvider(provider)
+                .credentialsProvider(provider)
                 .build();
 
         return null;
