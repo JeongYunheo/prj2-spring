@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.s3.S3Client;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,6 +24,8 @@ public class BoardService {
 
     private final BoardMapper mapper;
     private final MemberMapper memberMapper;
+    final S3Client s3Client;
+
 
     public void add(Board board, MultipartFile[] files, Authentication authentication) throws IOException {
         board.setMemberId(Integer.valueOf(authentication.getName()));
@@ -34,18 +37,8 @@ public class BoardService {
             for (MultipartFile file : files) {
                 // db에 해당 게시물의 파일 목록 저장
                 mapper.insertFileName(board.getId(), file.getOriginalFilename());
-                // 실제 파일 저장
-                // 부모 디렉토리 만들기
-                String dir = STR."C:/Temp/prj2/\{board.getId()}";
-                File dirFile = new File(dir);
-                if (!dirFile.exists()) {
-                    dirFile.mkdirs();
-                }
+                // 실제 파일 저장 s3
 
-                // 파일 경로
-                String path = STR."C:/Temp/prj2/\{board.getId()}/\{file.getOriginalFilename()}";
-                File destination = new File(path);
-                file.transferTo(destination);
             }
         }
 
