@@ -16,7 +16,6 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -137,10 +136,13 @@ public class BoardService {
 
         if (removeFileList != null && removeFileList.size() > 0) {
             for (String fileName : removeFileList) {
-                //disk delete
-                String path = STR."C:/Temp/prj2/\{board.getId()}/\{fileName}";
-                File file = new File(path);
-                file.delete();
+                //s3 delete
+                String key = STR."prj2/\{board.getId()}/\{fileName}";
+                DeleteObjectRequest objectRequest = DeleteObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(key).
+                        build();
+                s3Client.deleteObject(objectRequest);
                 //db recode delete
                 mapper.deleteFileByBoardIdAndName(board.getId(), fileName);
             }
@@ -155,14 +157,13 @@ public class BoardService {
                     mapper.insertFileName(board.getId(), fileName);
                 }
                 // disk에 쓰기
-                File dir = new File(STR."C:/Temp/prj2/\{board.getId()}");
-                if (!dir.exists()) {
-                    dir.mkdirs();
-                }
-
-                String path = STR."C:/Temp/prj2/\{board.getId()}/\{fileName}";
-                File destination = new File(path);
-                file.transferTo(destination);
+                String key = STR."prj2/\{board.getId()}/\{fileName}";
+                PutObjectRequest objectRequest = PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(key)
+                        .acl(ObjectCannedACL.PUBLIC_READ)
+                        .build();
+                s3Client.putObject(objectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
             }
         }
 
