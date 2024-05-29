@@ -127,3 +127,12 @@ FROM authority;
 
 SELECT *
 FROM member;
+
+#board like table create
+CREATE TABLE board_like
+(
+    board_id  INT REFERENCES board (id),
+    member_id INT REFERENCES member (id),
+    PRIMARY KEY (board_id, member_id)
+);
+
