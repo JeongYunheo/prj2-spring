@@ -136,3 +136,5 @@ CREATE TABLE board_like
     PRIMARY KEY (board_id, member_id)
 );
 
+SELECT *
+FROM board_like;
