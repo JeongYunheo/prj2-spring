@@ -150,4 +150,5 @@ public interface BoardMapper {
             AND member_id = #{memberId}
             """)
     int selectLikeByBoardIdAndMemberId(Integer boardId, String memberId);
+
 }
