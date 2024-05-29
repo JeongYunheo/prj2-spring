@@ -36,14 +36,14 @@ public class BoardService {
                 mapper.insertFileName(board.getId(), file.getOriginalFilename());
                 // 실제 파일 저장
                 // 부모 디렉토리 만들기
-                String dir = STR."C:/Windows/Temp/prj2/\{board.getId()}";
+                String dir = STR."C:/Temp/prj2/\{board.getId()}";
                 File dirFile = new File(dir);
                 if (!dirFile.exists()) {
                     dirFile.mkdirs();
                 }
 
                 // 파일 경로
-                String path = STR."C:/Windows/Temp/prj2/\{board.getId()}/\{file.getOriginalFilename()}";
+                String path = STR."C:/Temp/prj2/\{board.getId()}/\{file.getOriginalFilename()}";
                 File destination = new File(path);
                 file.transferTo(destination);
             }
@@ -109,7 +109,7 @@ public class BoardService {
         List<String> fileNames = mapper.selectFileNameByBoardId(id);
 
         // disk 에 있는 파일
-        String dir = STR."C:/Windows/Temp/prj2/\{id}/";
+        String dir = STR."C:/Temp/prj2/\{id}/";
         for (String fileName : fileNames) {
             File file = new File(dir + fileName);
             file.delete();
@@ -130,7 +130,7 @@ public class BoardService {
         if (removeFileList != null && removeFileList.size() > 0) {
             for (String fileName : removeFileList) {
                 //disk delete
-                String path = STR."C:/Windows/Temp/prj2/\{board.getId()}/\{fileName}";
+                String path = STR."C:/Temp/prj2/\{board.getId()}/\{fileName}";
                 File file = new File(path);
                 file.delete();
                 //db recode delete
@@ -147,12 +147,12 @@ public class BoardService {
                     mapper.insertFileName(board.getId(), fileName);
                 }
                 // disk에 쓰기
-                File dir = new File(STR."C:/Windows/Temp/prj2/\{board.getId()}");
+                File dir = new File(STR."C:/Temp/prj2/\{board.getId()}");
                 if (!dir.exists()) {
                     dir.mkdirs();
                 }
-                
-                String path = STR."C:/Windows/Temp/prj2/\{board.getId()}/\{fileName}";
+
+                String path = STR."C:/Temp/prj2/\{board.getId()}/\{fileName}";
                 File destination = new File(path);
                 file.transferTo(destination);
             }
