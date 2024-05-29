@@ -33,6 +33,9 @@ public class BoardService {
     @Value("${aws.s3.bucket.name}")
     String bucketName;
 
+    @Value("${image.src.prefix}")
+    String srcPrefix;
+
     public void add(Board board, MultipartFile[] files, Authentication authentication) throws IOException {
         board.setMemberId(Integer.valueOf(authentication.getName()));
 
@@ -48,7 +51,7 @@ public class BoardService {
                 PutObjectRequest objectRequest = PutObjectRequest.builder()
                         .bucket(bucketName).key(key)
                         .acl(ObjectCannedACL.PUBLIC_READ).build();
-                s3Client.putObject(objectRequest, RequestBody.empty());
+                s3Client.putObject(objectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 
             }
         }
@@ -99,7 +102,7 @@ public class BoardService {
         Board board = mapper.selectById(id);
         List<String> fileNames = mapper.selectFileNameByBoardId(id);
         List<BoardFile> files = fileNames.stream()
-                .map(name -> new BoardFile(name, STR."http://172.30.1.51:8888/\{id}/\{name}"))
+                .map(name -> new BoardFile(name, STR."\{srcPrefix}\{id}/\{name}"))
                 .toList();
 
         board.setFileList(files);

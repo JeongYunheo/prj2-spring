@@ -52,7 +52,7 @@ public class AppConfiguration {
                 .credentialsProvider(provider)
                 .build();
 
-        return null;
+        return s3Client;
     }
 
     @Bean
