@@ -98,7 +98,9 @@ public class BoardService {
         return Map.of("pageInfo", pageInfo, "boardList", mapper.selectAllPaging(offset, searchType, keyword));
     }
 
-    public Board get(Integer id) {
+    public Map<String, Object> get(Integer id, Authentication authentication) {
+        Map<String, Object> result = new HashMap<>();
+
         Board board = mapper.selectById(id);
         List<String> fileNames = mapper.selectFileNameByBoardId(id);
         List<BoardFile> files = fileNames.stream()
@@ -107,8 +109,19 @@ public class BoardService {
 
         board.setFileList(files);
 
+        Map<String, Object> like = new HashMap<>();
+        if (authentication == null) {
+            like.put("like", false);
+        } else {
+            int c = mapper.selectLikeByBoardIdAndMemberId(id, authentication.getName());
+            like.put("like", c == 1);
+        }
+        like.put("count", mapper.selectCountLikeByBoardId(id));
+        result.put("board", board);
+        result.put("like", like);
+
         // http://172.30.1.51:8888/{id}/{name}
-        return board;
+        return result;
     }
 
     public void remove(Integer id) {
