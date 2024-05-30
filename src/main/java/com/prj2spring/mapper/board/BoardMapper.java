@@ -45,7 +45,13 @@ public interface BoardMapper {
 
     @Select("""
             <script>
-            SELECT b.id, b.title, m.nick_name writer, COUNT(f.name) number_of_images
+            SELECT b.id,
+                    b.title,
+                    m.nick_name writer,
+                    COUNT(f.name) number_of_images,
+                    (SELECT COUNT(*)
+                     FROM board_like l
+                     WHERE l.board_id = b.id) number_of_like
             FROM board b JOIN member m ON b.member_id = m.id
                          LEFT JOIN board_file f ON f.board_id = b.id
                 <trim prefix="WHERE" prefixOverrides="OR">
