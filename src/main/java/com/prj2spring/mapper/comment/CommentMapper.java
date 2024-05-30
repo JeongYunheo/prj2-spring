@@ -12,7 +12,7 @@ public interface CommentMapper {
             (board_id, member_id, comment)
             VALUES (#{boardId}, #{memberId}, #{comment})
             """)
-    void insert(Comment comment);
+    int insert(Comment comment);
 
 
 }
