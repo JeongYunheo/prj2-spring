@@ -79,7 +79,7 @@ public class BoardService {
         Integer rightPageNumber = leftPageNumber + 9;
         rightPageNumber = Math.min(rightPageNumber, lastPageNumber);
         leftPageNumber = rightPageNumber - 9;
-        leftPageNumber = Math.max(leftPageNumber, 0);
+        leftPageNumber = Math.max(leftPageNumber, 1);
         Integer prevPageNumber = leftPageNumber - 1;
         Integer nextPageNumber = rightPageNumber + 1;
 
