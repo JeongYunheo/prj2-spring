@@ -23,8 +23,8 @@ public class CommentController {
         service.add(comment, authentication);
     }
 
-    @GetMapping("list")
-    public List<Comment> listComments(@RequestParam(value = "boardId", required = false) Integer boardId) {
+    @GetMapping("list/{boardId}")
+    public List<Comment> listComments(@PathVariable Integer boardId) {
         return service.listComment(boardId);
     }
 }
