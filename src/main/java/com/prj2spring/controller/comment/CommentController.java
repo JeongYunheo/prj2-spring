@@ -25,7 +25,7 @@ public class CommentController {
         if (service.validate(comment)) {
             service.add(comment, authentication);
 
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.badRequest().build();
         }
