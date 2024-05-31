@@ -53,5 +53,5 @@ public interface CommentMapper {
             SET comment = #{comment}
             WHERE id = #{id}
             """)
-    void update(Comment comment);
+    int update(Comment comment);
 }
