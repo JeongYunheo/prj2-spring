@@ -173,7 +173,7 @@ public class MemberService {
                         .issuedAt(now)
                         .expiresAt(now.plusSeconds(60 * 60 * 24 * 7))
                         .subject(db.getId().toString())
-                        .claim("scope", "admin")  //권한
+                        .claim("scope", authorityString)  //권한
                         .claim("nickName", db.getNickName())
                         .build();
 
